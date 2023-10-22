@@ -1,0 +1,12 @@
+<h1>Read later</h1>
+
+{% for manga in readlater %}
+    <div>
+        <img src="{{ manga.image }}">
+        <h2>{{ manga.title }} - <a href="{% url 'get_manga' manga.manga_id %}">Go</a></h2>
+    </div>
+{% empty %}
+    <p>Your readlist is empty!.</p>
+{% endfor %}
+
+

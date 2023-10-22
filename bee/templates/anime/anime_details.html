@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ anime.title }}</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    {% load textslice %}
+    <h1>{{ anime.title }}</h1>
+    <ul> 
+        <form action="{% url 'in_watchlater'%}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="anime_id" value="{{anime.id}}">
+        {% comment %} <input type="hidden" name="unwatch" value="{{ unwatch }}"> {% endcomment %}
+        <button type="submit">
+            {%if not unwatch%}Add to WatchLater
+            {%else %}Remove from WatchLater
+            {%endif%}
+        </button>
+        </form>
+        <li>Names: {{ anime.canonical_title }}</li>
+        <li>Status: {{ anime.status }}</li>
+        <li>Synopsis: {{ anime.synopsis | remove_rewrite}}</li>
+        <li>Episodes: {{ anime.episode_count }}</li>
+        <li>Age Rating: {{ anime.age_rating_guide }}</li>
+        <li>Popularity: {{ anime.popularity_rank }}</li>
+        <li>Rating: {{ anime.rating_rank }}</li>
+        {% if anime.cover_image %}
+            <li>Cover Image: <img src="{{ anime.cover_image }}" alt="Cover Image"></li>
+        {% endif %}
+        {% if anime.poster_image %}
+            <li>Poster Image: <img src="{{ anime.poster_image }}" alt="Poster Image"></li>
+        {% endif %}
+        <li>Genres:
+            <ul>
+                {% for genre in genres %}
+                    <a href="{% url 'get_genre_anime' genre %}"><li>{{  genre }}</li></a>
+                {% endfor %}
+            </ul>
+        </li>
+        {% if anime.created_at %}
+            <li>Started At: {{ anime.created_at|date:'Y-m-d' }}</li>
+        {% endif %}
+        {% if anime.end_date %}
+            <li>Ended At: {{ anime.end_date|date:'Y-m-d' }}</li>
+        {% endif %}
+        <li>Youtube: <a href="https://www.youtube.com/watch?v={{ anime.youtube_video_id }}">Watch on YouTube</a></li>
+        {% if anime.streaming_links %}
+            <li>Streaming Links:
+                <ul>
+                    {% for link in streaming_links %}
+                        <li>{{ link.title }}: <a href="{{ link.url }}">{{ link.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+
+        {% comment %} <!-- Comment Form -->
+        <h2>Post a Comment:</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <button type="submit">Post</button>
+        </form>
+        
+        <h2>Comments:</h2>
+        {% for comment in comments %}
+            <div class="comment">
+                <strong>{{ comment.user.username }}</strong>
+                <p>{{ comment.content }}</p>
+                <!-- Reply form -->
+                <form method="post">
+                    {% csrf_token %}
+                    {{ comment_form.as_p }}
+                    <input type="hidden" name="parent_id" value="{{ comment.anime_id }}">
+                    <button type="submit">Reply</button>
+                </form>
+                <!-- Replies -->
+                {% for reply in comment.replies.all %}
+                    <div class="reply">
+                        <strong>{{ reply.user.username }}</strong>
+                        <p>{{ reply.content }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %} {% endcomment %}
+
+
+    </ul>
+</body>
+</html>

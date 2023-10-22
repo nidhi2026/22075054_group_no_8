@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ manga.title }}</title>
+</head>
+<body>
+    {% load textslice %}
+    <h1>{{ manga.title }}</h1>
+    <ul> 
+        <form action="{% url 'in_readlater'%}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="manga_id" value="{{manga.id}}">
+            <button type="submit">
+                {%if not unread%}Add to ReadLater
+                {%else %}Remove from ReadLater
+                {%endif%}
+            </button>
+        </form>
+        <li>Status: {{ manga.status }}</li>
+        <li>Synopsis: {{ manga.synopsis | remove_rewrite}}</li>
+        <li>Chapters: {{ manga.chapter_count }}</li>
+        <li>Volumes: {{ manga.volumes_count }}</li>
+        <li>Age Rating: {{ manga.age_rating_guide }}</li>
+        <li>Popularity: {{ manga.popularity_rank }}</li>
+        <li>Rating: {{ manga.rating_rank }}</li>
+        {% if manga.cover_image %}
+            <li>Cover Image: <img src="{{ manga.cover_image }}" alt="Cover Image"></li>
+        {% endif %}
+        {% if manga.poster_image %}
+            <li>Poster Image: <img src="{{ manga.poster_image }}" alt="Poster Image"></li>
+        {% endif %}
+        <li>Genres:
+            <ul>
+                {% for genre in genres %}
+                    <a href="{% url 'get_genre_manga' genre %}"><li>{{  genre }}</li></a>
+                {% endfor %}
+            </ul>
+        </li>
+        {% if manga.created_at %}
+            <li>Started At: {{ manga.created_at|date:'Y-m-d' }}</li>
+        {% endif %}
+        {% if manga.end_date %}
+            <li>Ended At: {{ manga.end_date|date:'Y-m-d' }}</li>
+        {% endif %}
+    </ul>
+</body>
+</html>

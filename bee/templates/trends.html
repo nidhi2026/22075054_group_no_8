@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Realm - Fantasy</title>
+</head>
+<body>
+    <h1>Genres - Anime</h1>
+    <ul>
+        {% for genre in genres %}
+            <li>
+                <a href="{% url 'get_genre_anime' genre %}">{{ genre }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <h1>Genres - Manga</h1>
+    <ul>
+        {% for genre in genres %}
+            <li>
+                <a href="{% url 'get_genre_manga' genre %}">{{ genre }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <h1>Trending Anime</h1>
+    <ul>
+        {% for anime in animes %}
+            <li>
+                <a href="{% url 'get_anime' anime.id %}">{{ anime.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <h1>Fantasy</h1>
+    <ul>
+        {% for anime in fantasy %}
+            <li>
+                <a href="{% url 'get_anime' anime.id %}">{{ anime.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <footer><p>Still Looking for more!</p></footer>
+</body>
+</html>
