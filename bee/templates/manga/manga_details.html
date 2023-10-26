@@ -7,15 +7,31 @@
     {% load textslice %}
     <h1>{{ manga.title }}</h1>
     <ul> 
-        <form action="{% url 'in_readlater'%}" method="POST">
+        <form method="POST">
             {% csrf_token %}
+            <input type="hidden" name="post_type" value="readlater">
             <input type="hidden" name="manga_id" value="{{manga.id}}">
             <button type="submit">
                 {%if not unread%}Add to ReadLater
                 {%else %}Remove from ReadLater
                 {%endif%}
             </button>
-        </form>
+            </form>
+
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="post_type" value="reaction">
+                <input type="hidden" name="reaction_type" value="like">  <!-- Hidden input for liking -->
+                <button type="submit">Likes: {{likes}}</button>
+            </form>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="post_type" value="reaction">
+                <input type="hidden" name="reaction_type" value="dislike">  <!-- Hidden input for disliking -->
+                <button type="submit">Dislikes: {{dislikes}}</button>
+            </form>
+
         <li>Status: {{ manga.status }}</li>
         <li>Synopsis: {{ manga.synopsis | remove_rewrite}}</li>
         <li>Chapters: {{ manga.chapter_count }}</li>
@@ -42,6 +58,25 @@
         {% if manga.end_date %}
             <li>Ended At: {{ manga.end_date|date:'Y-m-d' }}</li>
         {% endif %}
+
+         <!-- Comment Form -->
+         <h2>Post a Comment:</h2>
+         <form method="post">
+             {% csrf_token %}
+             <input type="hidden" name="post_type" value="comment">
+             {{ comment_form.as_p }}
+             <button type="submit">Post</button>
+         </form>
+         
+         <h2>Comments:</h2>
+         {% for comment in comments %}
+             <div class="comment">
+                 <strong>{{ comment.user.username }}</strong>
+                 <h5>{{ comment.created_at }}</h5>
+                 <p>{{ comment.content }}</p>
+             </div>
+         {% endfor %}
+
     </ul>
 </body>
 </html>

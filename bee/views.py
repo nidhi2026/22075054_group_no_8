@@ -28,54 +28,68 @@ async def get_anime(request, anime_id):
     genres = [genre.title for genre in await anime.categories]
     streaming_links = [{'title':streams.title,'url':streams.url} for streams in await anime.streaming_links]
 
-    def get_unwatch_status(anime_id):
-        unwatch = request.session.get('unwatch', {})
-        if isinstance(unwatch, bool):  # If unwatch is a boolean
-            unwatch = {}  # Initialize it as an empty dictionary
-        request.session['unwatch'] = unwatch
-        request.session.save()
-        return unwatch.get(anime_id, False)
+    # Check if the anime is in the watchlist
+    user = request.user
+    watchlist_item = await sync_to_async(WatchList.objects.filter)(user=user, anime_id=anime_id)
+    unwatched = await sync_to_async(watchlist_item.exists)()
 
-    # Call the synchronous function using sync_to_async
-    unwatch = await sync_to_async(get_unwatch_status)(anime_id)
-    unwatche = (request.session.get('unwatch', {}))
-    if(unwatche.get(str(anime_id))!=None):
-        unwatched = unwatche[str(anime_id)]
+
+    comments = await sync_to_async(Comment_anime.objects.filter)(anime_id=anime_id)
+    comment_form = CommentFormAnime()
+    if request.method == 'POST':
+        post_type = request.POST.get('post_type')
+        
+        if post_type == 'comment':
+            comment_form = CommentFormAnime(data=request.POST)
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.anime_id = anime_id
+                await sync_to_async(setattr)(new_comment, 'user', request.user)
+                new_comment.created_at = await sync_to_async(timezone.now)()
+                await sync_to_async(new_comment.save)()
+                return HttpResponseRedirect(request.path_info)
+        
+        elif post_type == 'reaction':
+            reaction_type = request.POST.get('reaction_type')
+            # Use sync_to_async to create or update the reaction asynchronously
+            reaction, created = await sync_to_async(Reaction_anime.objects.get_or_create)(
+                user=request.user,
+                anime_id=anime_id,
+            )
+            # Update the reaction type based on the hidden input
+            if reaction_type == 'like':
+                reaction.reaction_type = Reaction_anime.LIKE
+            elif reaction_type == 'dislike':
+                reaction.reaction_type = Reaction_anime.DISLIKE
+            await sync_to_async(reaction.save)()
+
+        elif post_type == 'watchlater':
+            anime_id = request.POST.get('anime_id')  # Use get() to avoid KeyError
+            user = request.user
+
+            watchlist_item = await sync_to_async(WatchList.objects.filter)(user=user, anime_id=anime_id)
+            if await sync_to_async(watchlist_item.exists)():  # If this anime is already marked as unwatch
+                await sync_to_async(watchlist_item.delete)()  # Remove it from watchlist
+                unwatched = False  # Set its unwatch status to False
+            else: 
+                watchlist_item, created = await sync_to_async(WatchList.objects.get_or_create)(user=user, anime_id=anime_id)  # Add it to watchlist or get it if it already exists
+                unwatched = True  # Set its unwatch status to True only if it was created
+            return HttpResponseRedirect(request.path_info)
     else:
-        unwatched=False
+        comment_form = CommentFormAnime()
 
-    # comments = await sync_to_async(Comment.objects.filter)(id=anime_id, parent=None)
+    likes = await sync_to_async(Reaction_anime.objects.filter(anime_id=anime_id, reaction_type=Reaction_anime.LIKE).count)()
+    dislikes = await sync_to_async(Reaction_anime.objects.filter(anime_id=anime_id, reaction_type=Reaction_anime.DISLIKE).count)()
 
-    # if request.method == 'POST':
-    #     comment_form = CommentForm(data=request.POST)
-    #     if comment_form.is_valid():
-    #         new_comment = comment_form.save(commit=False)
-    #         new_comment.id = anime_id
-    #         # Assign the comment to a parent if it exists in the form
-    #         parent_id = request.POST.get('parent_id')
-    #         if parent_id:
-    #             new_comment.parent_id = parent_id
-    #         await sync_to_async(setattr)(new_comment, 'user', request.user)
-    #         new_comment.created_at = await sync_to_async(timezone.now)()
-    #         await sync_to_async(new_comment.save)()
-    #         return HttpResponseRedirect(request.path_info)
-    # else:
-    #     comment_form = CommentForm()
-    # return render(request, 'anime/anime_details.html', context={
-    #                                                     'anime': anime, 'genres': genres, 
-    #                                                     'streaming_links':streaming_links,
-    #                                                     'unwatch': unwatched,
-    #                                                     'comments': comments,
-    #                                                     'comment_form': comment_form,
-    #                                                     })
     response = await sync_to_async(render)(request, 'anime/anime_details.html', {
                                                         'anime': anime, 'genres': genres, 
                                                         'streaming_links':streaming_links,
                                                         'unwatch': unwatched,
-                                                        # 'comments': comments,
-                                                        # 'comment_form': comment_form,
+                                                        'comment_form': comment_form,
+                                                        'comments':comments,
+                                                        'likes':likes,
+                                                        'dislikes':dislikes,
                                                         })
-
     return response
 
 
@@ -86,27 +100,68 @@ async def get_manga(request, manga_id):
     # Fetch genres and await the coroutine
     genres = [genre.title for genre in await manga.categories]
 
-    # Define a synchronous function to interact with the session
-    def get_unread_status(manga_id):
-        unread = request.session.get('unread', {})
-        if isinstance(unread, bool):  # If unwatch is a boolean
-            unread = {}  # Initialize it as an empty dictionary
-        request.session['unread'] = unread
-        request.session.save()
-        return unread.get(manga_id, False)
+    # Check if the anime is in the watchlist
+    user = request.user
+    readlist_item = await sync_to_async(ReadList.objects.filter)(user=user, manga_id=manga_id)
+    unread = await sync_to_async(readlist_item.exists)()
 
-    # Call the synchronous function using sync_to_async
-    unread = await sync_to_async(get_unread_status)(manga_id)
-    unrede = (request.session.get('unread', {}))
-    if(unrede.get(str(manga_id))!=None):
-        unred = unrede[str(manga_id)]
+
+    comments = await sync_to_async(Comment_manga.objects.filter)(manga_id=manga_id)
+    comment_form = CommentFormManga()
+    if request.method == 'POST':
+        post_type = request.POST.get('post_type')
+        
+        if post_type == 'comment':
+            comment_form = CommentFormManga(data=request.POST)
+            if comment_form.is_valid():
+                new_comment = comment_form.save(commit=False)
+                new_comment.manga_id = manga_id
+                await sync_to_async(setattr)(new_comment, 'user', request.user)
+                new_comment.created_at = await sync_to_async(timezone.now)()
+                await sync_to_async(new_comment.save)()
+                return HttpResponseRedirect(request.path_info)
+        
+        elif post_type == 'reaction':
+            reaction_type = request.POST.get('reaction_type')
+            # Use sync_to_async to create or update the reaction asynchronously
+            reaction, created = await sync_to_async(Reaction_manga.objects.get_or_create)(
+                user=request.user,
+                manga_id=manga_id,
+            )
+            # Update the reaction type based on the hidden input
+            if reaction_type == 'like':
+                reaction.reaction_type = Reaction_manga.LIKE
+            elif reaction_type == 'dislike':
+                reaction.reaction_type = Reaction_manga.DISLIKE
+            await sync_to_async(reaction.save)()
+
+        elif post_type == 'readlater':
+            manga_id = request.POST.get('manga_id')  # Use get() to avoid KeyError
+            user = request.user
+
+            readlist_item = await sync_to_async(ReadList.objects.filter)(user=user, manga_id=manga_id)
+            if await sync_to_async(readlist_item.exists)():  # If this anime is already marked as unwatch
+                await sync_to_async(readlist_item.delete)()  # Remove it from watchlist
+                unread = False  # Set its unwatch status to False
+            else: 
+                readlist_item, created = await sync_to_async(ReadList.objects.get_or_create)(user=user, manga_id=manga_id)  # Add it to watchlist or get it if it already exists
+                unread = True  # Set its unwatch status to True only if it was created
+            return HttpResponseRedirect(request.path_info)
     else:
-        unred=False
+        comment_form = CommentFormManga()
 
-    return render(request, 'manga/manga_details.html', context={
+    likes = await sync_to_async(Reaction_manga.objects.filter(manga_id=manga_id, reaction_type=Reaction_manga.LIKE).count)()
+    dislikes = await sync_to_async(Reaction_manga.objects.filter(manga_id=manga_id, reaction_type=Reaction_manga.DISLIKE).count)()
+
+    response = await sync_to_async(render)(request, 'manga/manga_details.html', {
                                                         'manga': manga, 'genres': genres, 
-                                                        'unread': unred,
+                                                        'unread': unread,
+                                                        'comment_form': comment_form,
+                                                        'comments':comments,
+                                                        'likes':likes,
+                                                        'dislikes':dislikes,
                                                         })
+    return response
 
 
 async def get_genre_anime(request, genre):
@@ -122,50 +177,6 @@ async def get_genre_manga(request, genre):
     genre_manga = [{'id': manga.id, 'title': manga.title} for manga in mangas if manga.title!=None]
 
     return render(request, 'manga/genre_manga.html', context={'genre_manga':genre_manga, 'genre':genre})
-
-def in_watchlater(request):
-    if request.method == "POST":
-        anime_id = request.POST.get('anime_id')  # Use get() to avoid KeyError
-        user = request.user
-        unwatch = request.session.get('unwatch', {})  # Get the unwatch dictionary from the session
-
-        if isinstance(unwatch, bool):  # If unwatch is a boolean
-            unwatch = {}  # Initialize it as an empty dictionary
-
-        if anime_id in unwatch and unwatch[anime_id]:  # If this anime is already marked as unwatch
-            WatchList.objects.filter(user=user, anime_id=anime_id).delete()  # Remove it from watchlist
-            unwatch[anime_id] = False  # Set its unwatch status to False
-        else: 
-            watchlist_item, created = WatchList.objects.get_or_create(user=user, anime_id=anime_id)  # Add it to watchlist or get it if it already exists
-            if created:
-                unwatch[anime_id] = True  # Set its unwatch status to True only if it was created
-        # Store unwatch in session
-        request.session['unwatch'] = unwatch
-        request.session.modified = True
-
-        return redirect('get_anime', anime_id=anime_id)
-
-def in_readlater(request):
-    if request.method == "POST":
-        manga_id = request.POST.get('manga_id')  # Use get() to avoid KeyError
-        user = request.user
-        unread = request.session.get('unread', {})  # Get the unread dictionary from the session
-
-        if isinstance(unread, bool):  # If unread is a boolean
-            unread = {}  # Initialize it as an empty dictionary
-
-        if manga_id in unread and unread[manga_id]:  # If this mn=anga is already marked as unread
-            WatchList.objects.filter(user=user, manga_id=manga_id).delete()  # Remove it from readlist
-            unread[manga_id] = False  # Set its unread status to False
-        else: 
-            readlist_item, created = ReadList.objects.get_or_create(user=user, manga_id=manga_id)  # Add it to readlist or get it if it already exists
-            if created:
-                unread[manga_id] = True  # Set its unread status to True only if it was created
-        # Store unread in session
-        request.session['unread'] = unread
-        request.session.modified = True
-
-        return redirect('get_manga', manga_id=manga_id)
 
 async def watchlist(request):
     # Define a synchronous function to fetch data from the database

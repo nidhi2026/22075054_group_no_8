@@ -48,12 +48,11 @@ class Reaction_anime(models.Model):
         (LIKE, 'Like'),
         (DISLIKE, 'Dislike'),
     ]
-    ANIME = 'anime'
     anime_id = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    reaction_type = models.PositiveSmallIntegerField(choices=REACTION_CHOICES)
+    reaction_type = models.PositiveSmallIntegerField(choices=REACTION_CHOICES, default=LIKE)
     def __str__(self):
-        return f'{self.user.username} {self.reaction_type}s'
+        return f'{self.user.username} {self.reaction_type} (0->likes, 1->dislikes)'
     
 class Reaction_manga(models.Model):
     LIKE = 0
@@ -62,51 +61,28 @@ class Reaction_manga(models.Model):
         (LIKE, 'Like'),
         (DISLIKE, 'Dislike'),
     ]
-    MANGA = 'manga'
     manga_id = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    reaction_type = models.PositiveSmallIntegerField(choices=REACTION_CHOICES)
+    reaction_type = models.PositiveSmallIntegerField(choices=REACTION_CHOICES, default=LIKE)
     def __str__(self):
-        return f'{self.user.username} {self.reaction_type}s'
+        return f'{self.user.username} {self.reaction_type} (0->likes, 1->dislikes)'
 
 class Comment_anime(models.Model):
-    ANIME = 'anime'
     anime_id = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    # for reply to a comment
-    parent = models.ForeignKey('self' , null=True , blank=True , on_delete=models.CASCADE , related_name='replies')
     class Meta:
         ordering=['-created_at']
     def __str__(self):
-        return f'{self.user.username} commented {self.content} on {self.type}: {self.id}'
-    @property
-    def children(self):
-        return Comment_anime.objects.filter(parent=self).reverse()
-    @property
-    def is_parent(self):
-        if self.parent is None:
-            return True
-        return False
+        return f'{self.user.username} commented {self.content}'
     
 class Comment_manga(models.Model):
-    MANGA = 'manga'
     manga_id = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    # for reply to a comment
-    parent = models.ForeignKey('self' , null=True , blank=True , on_delete=models.CASCADE , related_name='replies')
     class Meta:
         ordering=['-created_at']
     def __str__(self):
-        return f'{self.user.username} commented {self.content} on {self.type}: {self.id}'
-    @property
-    def children(self):
-        return Comment_manga.objects.filter(parent=self).reverse()
-    @property
-    def is_parent(self):
-        if self.parent is None:
-            return True
-        return False
+        return f'{self.user.username} commented {self.content}'

@@ -5,14 +5,6 @@
         <img src="{{ anime.image }}">
         <h2>
             {{ anime.title }} - <a href="{% url 'get_anime' anime.anime_id %}">Go</a>
-            {% comment %} <form action="{% url 'in_watchlater'%}" method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="anime_id" value="{{anime.anime_id}}">
-                <input type="hidden" name="unwatch" value="{{ unwatch }}">
-                    <button type="submit">
-                        Unwatch
-                    </button>
-            </form> {% endcomment %}
         </h2>
     </div>
 {% empty %}
