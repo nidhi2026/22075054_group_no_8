@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Realm - Fantasy</title>
-</head>
-<body>
+{%extends 'base.html'%}
+
+{%block content%}
     <h1>Genres - Anime</h1>
     <ul>
         {% for genre in genres %}
@@ -37,5 +34,4 @@
         {% endfor %}
     </ul>
     <footer><p>Still Looking for more!</p></footer>
-</body>
-</html>
+{%endblock%}

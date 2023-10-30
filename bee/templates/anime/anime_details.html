@@ -25,6 +25,38 @@
     .genre:hover{
         color: white;
     }
+    #post{
+        background-color:#008864;
+        border-color:white;
+        border-width: 1px;
+    }
+    #post:hover{
+        background-color:#00b786;
+    }
+    label{
+        display:none;
+    }
+    textarea.form-control {
+        height: 8vh;
+        border-radius: 25px;
+        background-color: rgba(0, 136, 100, 0.3);
+        color: white;
+    }
+    textarea.form-control:focus{
+        background-color: rgba(0, 136, 100, 0.3);
+        color: white;
+    }
+    .read-more{
+        margin: 5px;
+        background-color:#008864;
+        color:white;
+        border-color:white;
+        border-width:1px;
+        border-radius:3px;
+    }
+    .read-more:hover{
+        background-color:#00b786;
+    }
 </style>
 <div>
     <div class="column">
@@ -35,33 +67,33 @@
                 {% endif %} 
             </div>
             <div class="col-md-8" style="font-size:15px;"> 
-                <div class="row">
-                    <h1 style="margin-left:15px;">{{ anime.title }}</h1>
-                    <!--WatchLater-->
-                    <form method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="post_type" value="watchlater">
-                        <input type="hidden" name="anime_id" value="{{anime.id}}">
-                        <button type="submit" style="margin: 10px;">
-                            {%if not unwatch%}Add to WatchLater
-                            {%else %}Remove from WatchLater
-                            {%endif%}
-                        </button>
-                    </form>
-                    <!--Reactions-->
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="post_type" value="reaction">
-                        <input type="hidden" name="reaction_type" value="like">  <!-- Hidden input for liking -->
-                        <button type="submit" style="margin: 10px;">Likes: {{likes}}</button>
-                    </form>
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="post_type" value="reaction">
-                        <input type="hidden" name="reaction_type" value="dislike">  <!-- Hidden input for disliking -->
-                        <button type="submit" style="margin: 10px;">Dislikes: {{dislikes}}</button>
-                    </form>
-                </div>
+                    <h1>{{ anime.title }}</h1>
+                    <div class="row" style="padding:10px;">
+                        <!--WatchLater-->
+                        <form method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_type" value="watchlater">
+                            <input type="hidden" name="anime_id" value="{{anime.id}}">
+                            <button type="submit" style="margin: 5px;background-color: transparent;">
+                                {%if not unwatch%}<i class="fa-regular fa-bookmark" style="color: #ffffff;"></i>
+                                {%else %}<i class="fa-solid fa-bookmark" style="color: #ffffff;"></i>
+                                {%endif%}
+                            </button>
+                        </form>
+                        <!--Reactions-->
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_type" value="reaction">
+                            <input type="hidden" name="reaction_type" value="like">  <!-- Hidden input for liking -->
+                            <button type="submit" style="margin: 5px;background-color: transparent;color:white;"><i class="fa-solid fa-heart" style="color: #ffffff;"></i> {{likes}}</button>
+                        </form>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_type" value="reaction">
+                            <input type="hidden" name="reaction_type" value="dislike">  <!-- Hidden input for disliking -->
+                            <button type="submit" style="margin: 5px;background-color: transparent;color:white;"><i class="fa-solid fa-heart-crack" style="color: #ffffff;"></i> {{dislikes}}</button>
+                        </form>
+                    </div>
                 <p>{{ anime.status }} | Ep {{ anime.episode_count }} | {{ anime.age_rating_guide }}</p>
                 <p>
                     <li style="display: flex;flex-direction:row;">Genres:
@@ -77,14 +109,14 @@
                 <div id="synopsis" style="height: 50px; overflow: hidden;">
                     <p>{{ anime.synopsis | remove_rewrite}}</p>
                 </div>
-                <button id="read-more" onclick="showSynopsis()">Read More</button>
+                <button id="read-more" onclick="showSynopsis()" class="read-more">Read More</button>
             </div>
         </div>
     </div>
     
     <div class="column">
         <p>
-            Name: {{ anime.canonical_title }}<br>
+            Name: {{ anime.canonical_title }}, {%for name in names %}{{name}}, {%endfor%}<br>
             Popularity: {{ anime.popularity_rank }}<br>
             Rating: {{ anime.rating_rank }}</br>
             {% if anime.created_at %}
@@ -107,16 +139,16 @@
 
     <div class="column">
         <!-- Comment Form -->
-        <h2>Post a Comment:</h2>
+        <h2>Post a Comment...</h2>
         <form method="post">
             {% csrf_token %}
             <input type="hidden" name="post_type" value="comment">
-            {{ comment_form.as_p }}
-            <button type="submit" class="btn btn-primary">Post</button>
+            {{ comment_form.as_p }} 
+            <button type="submit" class="btn btn-primary" id="post">Post</button>
         </form>
 
         <!-- Comments -->
-        <h2>Comments:</h2>
+        <h2>Comments</h2>
         {% for comment in comments %}
             <div class="comment">
                 <strong>{{ comment.user.username }}</strong>
@@ -143,95 +175,3 @@
 </script>
 
 {%endblock%}
-
-{% comment %} <!DOCTYPE html>
-<html>
-<head>
-    <title>{{ anime.title }}</title>
-</head>
-<body>
-    {% load textslice %}
-    <h1>{{ anime.title }}</h1>
-    <ul> 
-        <form method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="post_type" value="watchlater">
-        <input type="hidden" name="anime_id" value="{{anime.id}}">
-        <button type="submit">
-            {%if not unwatch%}Add to WatchLater
-            {%else %}Remove from WatchLater
-            {%endif%}
-        </button>
-        </form>
-
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="post_type" value="reaction">
-            <input type="hidden" name="reaction_type" value="like">  <!-- Hidden input for liking -->
-            <button type="submit">Likes: {{likes}}</button>
-        </form>
-        
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="post_type" value="reaction">
-            <input type="hidden" name="reaction_type" value="dislike">  <!-- Hidden input for disliking -->
-            <button type="submit">Dislikes: {{dislikes}}</button>
-        </form>
-
-        <li>Names: {{ anime.canonical_title }}</li>
-        <li>Status: {{ anime.status }}</li>
-        <li>Synopsis: {{ anime.synopsis | remove_rewrite}}</li>
-        <li>Episodes: {{ anime.episode_count }}</li>
-        <li>Age Rating: {{ anime.age_rating_guide }}</li>
-        <li>Popularity: {{ anime.popularity_rank }}</li>
-        <li>Rating: {{ anime.rating_rank }}</li>
-        {% if anime.cover_image %}
-            <li>Cover Image: <img src="{{ anime.cover_image }}" alt="Cover Image"></li>
-        {% endif %}
-        {% if anime.poster_image %}
-            <li>Poster Image: <img src="{{ anime.poster_image }}" alt="Poster Image"></li>
-        {% endif %}
-        <li>Genres:
-            <ul>
-                {% for genre in genres %}
-                    <a href="{% url 'get_genre_anime' genre %}"><li>{{  genre }}</li></a>
-                {% endfor %}
-            </ul>
-        </li>
-        {% if anime.created_at %}
-            <li>Started At: {{ anime.created_at|date:'Y-m-d' }}</li>
-        {% endif %}
-        {% if anime.end_date %}
-            <li>Ended At: {{ anime.end_date|date:'Y-m-d' }}</li>
-        {% endif %}
-        <li>Youtube: <a href="https://www.youtube.com/watch?v={{ anime.youtube_video_id }}">Watch on YouTube</a></li>
-        {% if anime.streaming_links %}
-            <li>Streaming Links:
-                <ul>
-                    {% for link in streaming_links %}
-                        <li>{{ link.title }}: <a href="{{ link.url }}">{{ link.title }}</a></li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {% endif %}
-
-        <!-- Comment Form -->
-        <h2>Post a Comment:</h2>
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="post_type" value="comment">
-            {{ comment_form.as_p }}
-            <button type="submit">Post</button>
-        </form>
-        
-        <h2>Comments:</h2>
-        {% for comment in comments %}
-            <div class="comment">
-                <strong>{{ comment.user.username }}</strong>
-                <h5>{{ comment.created_at }}</h5>
-                <p>{{ comment.content }}</p>
-            </div>
-        {% endfor %}
-    </ul>
-</body>
-</html> {% endcomment %}

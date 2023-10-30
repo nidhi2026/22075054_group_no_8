@@ -1,0 +1,79 @@
+{%extends 'base.html'%}
+
+{%block content%}
+
+<style>
+    .search{
+        margin-left: 10px;
+        background-color:#008864;
+        color:white;
+        border-color:white;
+        border-width:1px;
+        border-radius:3px;
+    }
+    .search:hover{
+        background-color:#00b786;
+    }
+    .card {
+        position: relative;
+        overflow: hidden;
+    }
+    .card img {
+        transition: all 0.5s;
+    }
+    .title {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.7));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.5s;
+        z-index: 1; 
+    }
+    .card:hover .title {
+        opacity: 1;
+    }    
+</style>
+
+<form data-search-url="{% url 'search' %}" style="margin: 10px;display:flex;justify-content:center;">
+    <input type="text" id="search" name="q" placeholder="Search">
+    <input type="submit" value="Search" class="search">
+</form>
+
+<div class="container">
+    <div class="row" id="results">
+            <!-- Search results will be displayed here -->
+
+    </div>
+</div>
+
+<div class="container">
+    <div class="row" style="display:flex;justify-content:center;" id="old-results">
+    {% if results %}
+        {% for result in results %}
+        <div class="col-lg-2 col-md-3 col-sm-4 mb-4">
+                    {% if result.title != "No anime available with this name" %}
+                    <div class="card h-100">
+                            <a href="{% url 'get_anime' result.id %}">
+                            <p class="title">{{ result.title }}</p>
+                            <img src="{{ result.image_url }}" alt="{{ result.title }}" class="card-img-top" style="object-fit: cover;top:0;">
+                            </a>
+                    </div>
+                    {%else %}
+                        <p>Nothing more to display...</p>
+                    {%endif%}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Not available, you sure u r right?</p>
+    {% endif %}
+    </div>
+</div>
+
+{%endblock%}

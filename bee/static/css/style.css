@@ -2,6 +2,7 @@ body {
     background: #000000;
     color: #dbdbdb;
     margin-top: 5rem;
+    font-family: cursive;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -14,6 +15,7 @@ body {
   
   .bg-steel {
     background-color: #008864;
+    color:rgb(0, 136, 100);
   }
   
   .site-header .navbar-nav .nav-link {
@@ -29,7 +31,7 @@ body {
   }
   
   .content-section {
-    background: #ffffff;
+    background: #575656;
     padding: 10px 20px;
     border: 1px solid #dddddd;
     border-radius: 3px;

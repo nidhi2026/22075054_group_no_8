@@ -3,12 +3,13 @@ import kitsu
 from .models import *
 from .forms import *
 from asgiref.sync import sync_to_async
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.utils import timezone
+import asyncio
 
 
 # Create your views here.
-async def trending(request):
+async def main_page(request):
     client = kitsu.Client()
     tre_animes = await client.trending_anime()
     animes = [{'id': anime.id, 'title': anime.title} for anime in tre_animes]
@@ -18,7 +19,8 @@ async def trending(request):
 
     genres_list = [ "Action","Adventure","Comedy","Fantasy","Horror","Mecha","Music","Mystery","Psychological","Romance","Sci-Fi","Slice of Life","Sports","Supernatural","Thriller"]
 
-    return render(request, 'trends.html', {'animes': animes, 'fantasy':fantasy, 'genres':genres_list})
+    response = await sync_to_async(render)(request, 'index.html', {'animes': animes, 'fantasy':fantasy, 'genres':genres_list})
+    return response
 
 async def get_anime(request, anime_id):
     client = kitsu.Client()
@@ -45,7 +47,7 @@ async def get_anime(request, anime_id):
                 new_comment = comment_form.save(commit=False)
                 new_comment.anime_id = anime_id
                 await sync_to_async(setattr)(new_comment, 'user', request.user)
-                new_comment.created_at = await sync_to_async(timezone.now)()
+                new_comment.created_at = (await sync_to_async(timezone.now)()).date()
                 await sync_to_async(new_comment.save)()
                 return HttpResponseRedirect(request.path_info)
         
@@ -80,7 +82,7 @@ async def get_anime(request, anime_id):
 
     likes = await sync_to_async(Reaction_anime.objects.filter(anime_id=anime_id, reaction_type=Reaction_anime.LIKE).count)()
     dislikes = await sync_to_async(Reaction_anime.objects.filter(anime_id=anime_id, reaction_type=Reaction_anime.DISLIKE).count)()
-
+    anime_names = (anime.abbreviated_titles)[:3]
     response = await sync_to_async(render)(request, 'anime/anime_details.html', {
                                                         'anime': anime, 'genres': genres, 
                                                         'streaming_links':streaming_links,
@@ -89,6 +91,7 @@ async def get_anime(request, anime_id):
                                                         'comments':comments,
                                                         'likes':likes,
                                                         'dislikes':dislikes,
+                                                        'names':anime_names,
                                                         })
     return response
 
@@ -117,7 +120,7 @@ async def get_manga(request, manga_id):
                 new_comment = comment_form.save(commit=False)
                 new_comment.manga_id = manga_id
                 await sync_to_async(setattr)(new_comment, 'user', request.user)
-                new_comment.created_at = await sync_to_async(timezone.now)()
+                new_comment.created_at = (await sync_to_async(timezone.now)()).date()
                 await sync_to_async(new_comment.save)()
                 return HttpResponseRedirect(request.path_info)
         
@@ -163,20 +166,27 @@ async def get_manga(request, manga_id):
                                                         })
     return response
 
-
 async def get_genre_anime(request, genre):
     client = kitsu.Client()
     animes = await client.search_anime(genres=[genre.lower()], limit=20)
-    genre_anime = [{'id': anime.id, 'title': anime.title} for anime in animes if anime.title!=None]
-
-    return render(request, 'anime/genre_anime.html', context={'genre_anime':genre_anime, 'genre':genre})
+    genre_anime=[]
+    for anime in animes:
+        if anime.title!=None:
+            ani=await client.get_anime(anime.id)
+            genre_anime.append(ani)
+    response = await sync_to_async(render)(request, 'anime/genre_anime.html', context={'genre_anime':genre_anime, 'genre':genre})
+    return response
 
 async def get_genre_manga(request, genre):
     client = kitsu.Client()
     mangas = await client.search_manga(genres=[genre.lower()], limit=20)
-    genre_manga = [{'id': manga.id, 'title': manga.title} for manga in mangas if manga.title!=None]
-
-    return render(request, 'manga/genre_manga.html', context={'genre_manga':genre_manga, 'genre':genre})
+    genre_manga=[]
+    for manga in mangas:
+        if manga.title!=None:
+            man=await client.get_manga(manga.id)
+            genre_manga.append(man)
+    response = await sync_to_async(render)(request, 'manga/genre_manga.html', context={'genre_manga':genre_manga, 'genre':genre})
+    return response
 
 async def watchlist(request):
     # Define a synchronous function to fetch data from the database
@@ -215,3 +225,31 @@ async def readlist(request):
 
     render_func = sync_to_async(render, thread_sensitive=True)
     return await render_func(request, 'manga/readlist.html', {'readlater': readlist})
+
+async def search_kitsu(query):
+    client = kitsu.Client()
+    results = await client.search_anime(query, limit=20)
+    # Convert Title objects to JSON-serializable format
+    formatted_results = []
+    for result in results:
+        if result.title.en and query.lower() in (result.title.en).lower():
+            formatted_results.append({
+                'id':result.id,
+                'title': result.title.en,
+                'image_url': result.poster_image(_type='small')
+            })
+    if not formatted_results:
+        return [{'title': "No anime available with this name", 'image_url': 'result.poster_image(_type="small")'}]
+    return formatted_results
+
+def search(request):
+    query = request.GET.get('q','abcdefghijklmnopqrstuvwxyz')
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    results = loop.run_until_complete(search_kitsu(query))
+    # Check if the request is an AJAX request
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # Return a JSON response
+        return JsonResponse(results, safe=False)
+    # If it's not an AJAX request, render the template as usual
+    return render(request, 'search.html', {'results': results})
