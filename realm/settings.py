@@ -20,14 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-# SECRET_KEY = "django-insecure-!etu!uol2nv8y_%3a@1dk7o+w_4s=1tfqoxaro7-haq9lyp2u1"
-
+SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.environ.get("DEBUG","False").lower() == "true"
+DEBUG = os.environ.get("DEBUG","False").lower() == "true"
 
-# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
-DEBUG=True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+# DEBUG=True
+# ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -78,9 +77,10 @@ WSGI_APPLICATION = "realm.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+database_url = os.environ.get("DATABASE_URL")
 DATABASES = {
     # "default": dj_database_url.parse(database_url)
-    "default": dj_database_url.parse("postgres://anime_dreamscape_user:8vIvomlK3unjq2v8Udo75FtPJJBmAVus@dpg-cl3v5riuuipc738niu3g-a.oregon-postgres.render.com/anime_dreamscape")
+    "default": dj_database_url.parse(database_url)
 }
 
 
