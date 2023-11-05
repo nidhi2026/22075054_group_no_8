@@ -21,10 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 SECRET_KEY = os.environ.get("SECRET_KEY")
+
+# SECRET_KEY = "django-insecure-ai%d(lf!#3ycb*mx1(!su2+qd@!5r(w_lhd%(x)&7jc^xjh8t-"
+
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = os.environ.get("DEBUG","False").lower() == "true"
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+
 # DEBUG=True
 # ALLOWED_HOSTS = []
 
@@ -82,7 +87,12 @@ DATABASES = {
     # "default": dj_database_url.parse(database_url)
     "default": dj_database_url.parse(database_url)
 }
-
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
