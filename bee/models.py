@@ -51,6 +51,8 @@ class Reaction_anime(models.Model):
     anime_id = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     reaction_type = models.PositiveSmallIntegerField(choices=REACTION_CHOICES, default=LIKE)
+    class Meta:
+        unique_together = ('anime_id', 'user','reaction_type',)
     def __str__(self):
         return f'{self.user.username} {self.reaction_type} (0->likes, 1->dislikes)'
     

@@ -3,7 +3,11 @@
 {%block content%}
 <style>
     .bg-cover{
-        background: linear-gradient(rgba(5,5,5,0.8),rgba(5,5,5,0.8)), url('{{anime.cover_image}}') no-repeat center center fixed; 
+        background: linear-gradient(rgba(5,5,5,0.77),rgba(5,5,5,0.77)), url(
+            {% if anime.cover_image %}'{{anime.cover_image}}'
+            {% else %} '{{anime.poster_image}}'
+            {%endif%}
+            ) no-repeat center center fixed; 
         -webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
@@ -20,18 +24,19 @@
     }
     .genre{
         text-decoration:none;
-        color:gray;
+        color:#acaaaa;
     }
     .genre:hover{
         color: white;
     }
     #post{
-        background-color:#008864;
+        background-color:transparent;
         border-color:white;
         border-width: 1px;
     }
     #post:hover{
-        background-color:#00b786;
+        background-color:white;
+        color:black;
     }
     label{
         display:none;
@@ -39,35 +44,42 @@
     textarea.form-control {
         height: 8vh;
         border-radius: 25px;
-        background-color: rgba(0, 136, 100, 0.3);
+        background-color: rgba(77, 87, 84, 0.3);
         color: white;
     }
     textarea.form-control:focus{
-        background-color: rgba(0, 136, 100, 0.3);
+        background-color: rgba(77, 87, 84, 0.3);
         color: white;
     }
     .read-more{
-        margin: 5px;
-        background-color:#008864;
+        margin: 1px;
+        background-color:transparent;
         color:white;
         border-color:white;
         border-width:1px;
         border-radius:3px;
     }
     .read-more:hover{
-        background-color:#00b786;
+        background-color:white;
+        color:black;
+    }
+    .comment-left{
+        text-align:left;    
+    }
+    .comment-right{
+        text-align:right;
     }
 </style>
 <div>
     <div class="column">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-12 col-lg-4">
                 {% if anime.poster_image %}
                 <img src="{{ anime.poster_image }}" alt="Poster Image" class="poster">
                 {% endif %} 
             </div>
-            <div class="col-md-8" style="font-size:15px;"> 
-                    <h1>{{ anime.title }}</h1>
+            <div class="col-md-12 col-lg-8" style="font-size:15px;"> 
+                    <h1 style="color:white;">{{ anime.title }}</h1>
                     <div class="row" style="padding:10px;">
                         <!--WatchLater-->
                         <form method="POST">
@@ -85,13 +97,25 @@
                             {% csrf_token %}
                             <input type="hidden" name="post_type" value="reaction">
                             <input type="hidden" name="reaction_type" value="like">  <!-- Hidden input for liking -->
-                            <button type="submit" style="margin: 5px;background-color: transparent;color:white;"><i class="fa-solid fa-heart" style="color: #ffffff;"></i> {{likes}}</button>
+                            <input type="hidden" name="anime_id" value="{{anime.id}}">
+                            <button type="submit" style="margin: 5px;background-color: transparent;color:white;">
+                                {%if not liked%}<i class="fa-regular fa-heart" style="color: #ffffff;"></i>
+                                {%else %}<i class="fa-solid fa-heart" style="color: #ffffff;"></i>
+                                {%endif%}
+                                {{likes}}
+                            </button>
                         </form>
                         <form method="post">
                             {% csrf_token %}
                             <input type="hidden" name="post_type" value="reaction">
                             <input type="hidden" name="reaction_type" value="dislike">  <!-- Hidden input for disliking -->
-                            <button type="submit" style="margin: 5px;background-color: transparent;color:white;"><i class="fa-solid fa-heart-crack" style="color: #ffffff;"></i> {{dislikes}}</button>
+                            <input type="hidden" name="anime_id" value="{{anime.id}}">
+                            <button type="submit" style="margin: 5px;background-color: transparent;color:white;">
+                                {%if not disliked%}<i class="fa-regular fa-thumbs-down" style="color: #ffffff;"></i>
+                                {%else %}<i class="fa-solid fa-thumbs-down" style="color: #ffffff;"></i>
+                                {%endif%}
+                                {{dislikes}}
+                            </button>
                         </form>
                     </div>
                 <p>{{ anime.status }} | Ep {{ anime.episode_count }} | {{ anime.age_rating_guide }}</p>
@@ -127,13 +151,13 @@
             {% endif %}
         </p>
         <p>
-            Youtube: <a href="https://www.youtube.com/watch?v={{ anime.youtube_video_id }}" class="genre">Watch on YouTube</a><br>
             {% if anime.streaming_links %}
             Streaming Links:<br>
                         {% for link in streaming_links %}
                            {{ link.title }}: <a href="{{ link.url }}" class="genre">{{ link.title }}</a><br>
                         {% endfor %}
             {% endif %}
+            Youtube: <a href="https://www.youtube.com/watch?v={{ anime.youtube_video_id }}" class="genre">Watch on YouTube</a><br>
         </p>
     </div>
 
@@ -149,12 +173,13 @@
 
         <!-- Comments -->
         <h2>Comments</h2>
-        {% for comment in comments %}
-            <div class="comment">
-                <strong>{{ comment.user.username }}</strong>
-                <p>{{ comment.created_at }}</p>
-                <p>{{ comment.content }}</p>
-            </div>
+        {% for comment in comments %}  
+                <div class="comment-{%if you.username == comment.user.username %}right{%else%}left{%endif%}" id="comment">
+                    <p style="margin-bottom:10px;padding:10px;"><strong>{{ comment.user.username }}</strong>
+                    <span style="font-size: 13px;color:#626e6a">{{ comment.created_at |date:'M. d, Y'}}</span>
+                    <br><span style="color:#c4dad2;">{{ comment.content }}</span>
+                    </p>
+                </div>
         {% endfor %}
     </div>
 </div>

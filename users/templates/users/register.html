@@ -1,6 +1,30 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{%load static%}
 {% block content %}
+
+<style>
+.form-container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-right:30px;
+}
+#signin{
+    color:#acaaaa;
+}
+#signin:hover{
+    color:white;
+}
+@media screen and (max-width: 600px) {
+    .form-container img {
+        display: none;
+    }
+}
+</style>
+
+<div class="form-container">
+    <img src="{% static 'hime.png' %}">
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
@@ -14,8 +38,12 @@
         </form>
         <div class="border-top pt-3">
             <small class="text-muted">
-                Already Have An Account? <a class="ml-2" href="{% url 'login'%}">Sign In</a>
+                Already Have An Account? <a class="ml-2" href="{% url 'login'%}" id="signin">Sign In</a>
             </small>
         </div>
     </div>
+</div>
+
 {% endblock content %}
+
+

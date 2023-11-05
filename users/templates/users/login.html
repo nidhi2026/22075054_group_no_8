@@ -1,6 +1,31 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
+{%load static%}
 {% block content %}
+<style>
+    .form-container{
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        margin-right:100px;
+    }
+    #create{
+        color:#acaaaa;
+    }
+    #create:hover{
+        color:white;
+    }
+    @media screen and (max-width: 600px) {
+        .form-container img {
+            display: none;
+        }
+        .form-container{
+            margin-right:0px;
+        }
+    }
+</style>
+    <div class="form-container">
+        <img src="{% static 'himy.png' %}">
     <div class="content-section">
         <form method="POST">
             {% csrf_token %}
@@ -14,8 +39,9 @@
         </form>
         <div class="border-top pt-3">
             <small class="text-muted">
-                No Account? <a class="ml-2" href="{% url 'register'%}">Create One</a>
+                No Account? <a class="ml-2" href="{% url 'register'%}" id="create">Create One</a>
             </small>
         </div>
     </div>
+</div>
 {% endblock content %}

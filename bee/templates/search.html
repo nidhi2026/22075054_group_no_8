@@ -3,16 +3,23 @@
 {%block content%}
 
 <style>
+    #search{
+        background-color: #1c2724;
+        border: 0px;
+        padding:5px;
+        color: white;
+    }
     .search{
         margin-left: 10px;
-        background-color:#008864;
         color:white;
-        border-color:white;
-        border-width:1px;
         border-radius:3px;
+        background-color:#1c2724;
+        border-color:white;
+        border-width: 1px;
     }
     .search:hover{
-        background-color:#00b786;
+        background-color:white;
+        color:black;
     }
     .card {
         position: relative;
@@ -65,8 +72,6 @@
                             <img src="{{ result.image_url }}" alt="{{ result.title }}" class="card-img-top" style="object-fit: cover;top:0;">
                             </a>
                     </div>
-                    {%else %}
-                        <p>Nothing more to display...</p>
                     {%endif%}
         </div>
         {% endfor %}
