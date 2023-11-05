@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+  .form-container{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      margin-right:100px;
+  }
+  a{
+      color:#acaaaa;
+  }
+  a:hover{
+      color:white;
+  }
+  @media screen and (max-width: 600px) {
+      .form-container img {
+          display: none;
+      }
+      .form-container{
+          margin-right:0px;
+      }
+  }
+  #update{
+      background-color: #ff3e3e;
+      border-color: #ffc197;
+      color: white;
+  }
+  #update:hover{
+      background-color: #ff6700;
+  }
+</style>
+<div class = "form-container">
+  <div class="content-section" style="background-color:black;font-weight:700;">
+      <div class="media">
+        <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+        <div class="media-body">
+          <h2 class="account-heading">{{ user.username }}</h2>
+          <p class="text-secondary">{{ user.email }}</p>
+        </div>
+      </div>
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Profile Info</legend>
+            {{ u_form|crispy }}
+            {{ p_form|crispy }}
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-info" type="submit" id="update">Update</button>
+        </div>
+    </form>
+  </div>
+</div>
+
+{% endblock%}

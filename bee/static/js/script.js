@@ -49,13 +49,3 @@ $(document).ready(function() {
     });
 });
 
-
-$('#animeCarousel').on('slide.bs.carousel', function (e) {
-    var $activeIndicator = $(this).find('.carousel-indicators li.active .indicator-progress');
-    $activeIndicator.animate({ width: '0%' }, 0);
-});
-
-$('#animeCarousel').on('slid.bs.carousel', function (e) {
-    var $nextIndicator = $(this).find('.carousel-indicators li.active .indicator-progress');
-    $nextIndicator.animate({ width: '100%' }, 5000); // Adjust the duration to match the slide interval
-});

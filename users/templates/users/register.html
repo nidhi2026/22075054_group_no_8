@@ -21,11 +21,19 @@
         display: none;
     }
 }
+#signup{
+    background-color: #ff3e3e;
+    border-color: #ffc197;
+    color: white;
+}
+#signup:hover{
+    background-color: #ff6700;
+}
 </style>
 
 <div class="form-container">
     <img src="{% static 'hime.png' %}">
-    <div class="content-section">
+    <div class="content-section" style="background-color:#1c2724;font-weight:700;">
         <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
@@ -33,7 +41,7 @@
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">
-                <button class="btn btn-outline-info" type="submit">Sign Up</button>
+                <button class="btn btn-outline-info" type="submit" id="signup">Sign Up</button>
             </div>
         </form>
         <div class="border-top pt-3">

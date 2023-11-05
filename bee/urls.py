@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views 
 
+
 urlpatterns = [
     path('', views.trending, name="trending"),
     path('anime/<int:anime_id>/', views.get_anime, name='get_anime'),
@@ -11,3 +12,4 @@ urlpatterns = [
     path('readlist/', views.readlist, name='readlist'),
     path('search/', views.search, name='search'),
 ]
+

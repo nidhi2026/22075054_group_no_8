@@ -1,12 +1,66 @@
-<h1>Read later</h1>
-
-{% for manga in readlater %}
-    <div>
-        <img src="{{ manga.image }}">
-        <h2>{{ manga.title }} - <a href="{% url 'get_manga' manga.manga_id %}">Go</a></h2>
+{% extends 'base.html' %}
+{%load static%}
+{% block content %}
+<style>
+    .card {
+        position: relative;
+        overflow: hidden;
+    }
+    .card img {
+        transition: all 0.5s;
+    }
+    .title {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.7));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.5s;
+        z-index: 1; 
+    }
+    .card:hover .title {
+        opacity: 1;
+    } 
+    .carrot{
+        padding-top:30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+}
+</style>
+<div class="container">
+    <p style="display: flex;justify-content: center;font-size: xxx-large;">Read later</p>
+    <div class="row" style="display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;">
+        {% for manga in readlater %}
+            <div class="col-lg-2 col-md-3 col-sm-4 mb-4">
+                <a href="{% url 'get_manga' manga.manga_id %}" target="_blank">
+                <div class="card h-100">
+                    {% if manga.image %}
+                        <p class="title">{{ manga.title }}</p>
+                        <img src="{{ manga.image }}" alt="Poster Image" class="card-img-top" style="height: 250px; object-fit: cover;">
+                    {% endif %}
+                </div>
+                </a>
+            </div>
+            {% empty %}
+                <div class="carrot">
+                    <img src="{% static 'carrot.png' %}">
+                    <p>Your readlist is empty!</p>
+                </div>
+        {% endfor %}
     </div>
-{% empty %}
-    <p>Your readlist is empty!.</p>
-{% endfor %}
+</div>
+
+{% endblock %}
 
 

@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
+# SECRET_KEY = "django-insecure-!etu!uol2nv8y_%3a@1dk7o+w_4s=1tfqoxaro7-haq9lyp2u1"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -122,6 +122,10 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "bee/static"),
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = 'media/'
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Default primary key field type
@@ -130,3 +134,4 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "trending"
+LOGIN_URL = "login"
