@@ -20,7 +20,7 @@ async def trending(request):
     response = await sync_to_async(render)(request, 'index.html', {'animes': tre_animes, 'genres_list':genres_list})
     return response
 
-@login_required
+
 async def get_anime(request, anime_id):
     client = kitsu.Client()
     anime = await client.get_anime(anime_id)
@@ -120,7 +120,7 @@ async def get_anime(request, anime_id):
                                                         })
     return response
 
-@login_required
+
 async def get_manga(request, manga_id):
     client = kitsu.Client()
     manga = await client.get_manga(manga_id)
