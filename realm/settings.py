@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,18 +20,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# SECRET_KEY = "django-insecure-ai%d(lf!#3ycb*mx1(!su2+qd@!5r(w_lhd%(x)&7jc^xjh8t-"
+SECRET_KEY = "django-insecure-ai%d(lf!#3ycb*mx1(!su2+qd@!5r(w_lhd%(x)&7jc^xjh8t-"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
-DEBUG = os.environ.get("DEBUG","False").lower() == "true"
-
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
-
-# DEBUG=True
-# ALLOWED_HOSTS = []
+DEBUG=True
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -82,10 +77,15 @@ WSGI_APPLICATION = "realm.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-database_url = os.environ.get("DATABASE_URL")
 DATABASES = {
-    # "default": dj_database_url.parse(database_url)
-    "default": dj_database_url.parse(database_url)
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'kiwi',
+        'USER': 'root',
+        'PASSWORD': 'madras@1234',
+        'HOST': 'localhost',  
+        'PORT': '3306',
+    }
 }
 # DATABASES = {
 #     "default": {

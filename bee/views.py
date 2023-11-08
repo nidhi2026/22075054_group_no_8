@@ -20,7 +20,7 @@ async def trending(request):
     response = await sync_to_async(render)(request, 'index.html', {'animes': tre_animes, 'genres_list':genres_list})
     return response
 
-@login_required
+
 async def get_anime(request, anime_id):
     client = kitsu.Client()
     anime = await client.get_anime(anime_id)
@@ -120,7 +120,7 @@ async def get_anime(request, anime_id):
                                                         })
     return response
 
-@login_required
+
 async def get_manga(request, manga_id):
     client = kitsu.Client()
     manga = await client.get_manga(manga_id)
@@ -217,7 +217,6 @@ async def get_manga(request, manga_id):
                                                         })
     return response
 
-
 async def get_genre_anime(request, genre):
     client = kitsu.Client()
     animes = await client.search_anime(genres=[genre.lower()], limit=15)
@@ -266,15 +265,19 @@ async def readlist(request):
         readlater = ReadList.objects.filter(user=request.user)
         return [manga.manga_id for manga in readlater]
 
-    # Call the synchronous function using sync_to_async
+    # # Call the synchronous function using sync_to_async
     data = await sync_to_async(fetch_data)()
     readlist = []
 
     client = kitsu.Client()
     for manga_id in data:
-        a = await client.get_manga(manga_id)
-        readlist.append({'manga_id':manga_id, 'title':a.title, 'image':a.poster_image})
-    readlist=readlist[::-1]
+        # a = await client.get_manga(manga_id)
+        readlist.append({'manga_id':manga_id,
+                        #   'title':a.title,
+                        #   'image':a.poster_image(_type='small')
+                          })
+        # print(a.title, a.poster_image(_type='small'))
+    # readlist=readlist[::-1]
 
     render_func = sync_to_async(render, thread_sensitive=True)
     return await render_func(request, 'manga/readlist.html', {'readlater': readlist, 'genres_list':genres_list})
