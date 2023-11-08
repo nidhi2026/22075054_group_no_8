@@ -32,7 +32,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
+            flex-direction: column; 
 }
 </style>
 <div class="container">
@@ -45,10 +45,10 @@
             <div class="col-lg-2 col-md-3 col-sm-4 mb-4">
                 <a href="{% url 'get_manga' manga.manga_id %}" target="_blank">
                 <div class="card h-100">
-                    {% comment %} {% if manga.image %}
+                    {% if manga.image %}
                         <p class="title">{{ manga.title }}</p>
                         <img src="{{ manga.image }}" alt="Poster Image" class="card-img-top" style="height: 250px; object-fit: cover;">
-                    {% endif %} {% endcomment %}
+                    {% endif %}
                 </div>
                 </a>
             </div>

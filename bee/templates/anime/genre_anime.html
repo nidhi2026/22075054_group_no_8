@@ -35,7 +35,11 @@
     <div class="row">
         {% for anime in genre_anime %}
             <div class="col-lg-2 col-md-3 col-sm-4 mb-4">
-                <a href="{% url 'get_anime' anime.id %}" target="_blank">
+                <a href='{% if  user.is_authenticated %} 
+                                {% url 'get_anime' anime.id %}
+                        {% else %}
+                                {% url 'login' %}
+                        {%endif%}' target="_blank">
                 <div class="card h-100">
                     {% if anime.poster_image %}
                         <p class="title">{{ anime.title }}</p>

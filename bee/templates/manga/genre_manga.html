@@ -35,7 +35,11 @@
     <div class="row">
         {% for manga in genre_manga %}
             <div class="col-lg-2 col-md-3 col-sm-4 mb-4">
-                <a href="{% url 'get_manga' manga.id %}" target="_blank">
+                <a href='{% if  user.is_authenticated %} 
+                                {% url 'get_manga' manga.id %}
+                        {% else %}
+                                {% url 'login' %}
+                        {%endif%}' target="_blank">
                 <div class="card h-100">
                     {% if manga.poster_image %}
                         <p class="title">{{ manga.title }}</p>

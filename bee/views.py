@@ -20,7 +20,6 @@ async def trending(request):
     response = await sync_to_async(render)(request, 'index.html', {'animes': tre_animes, 'genres_list':genres_list})
     return response
 
-
 async def get_anime(request, anime_id):
     client = kitsu.Client()
     anime = await client.get_anime(anime_id)
@@ -271,13 +270,13 @@ async def readlist(request):
 
     client = kitsu.Client()
     for manga_id in data:
-        # a = await client.get_manga(manga_id)
+        print("\n\n", manga_id, type(manga_id),"\n\n")
+        a = await client.get_manga(manga_id)
         readlist.append({'manga_id':manga_id,
-                        #   'title':a.title,
-                        #   'image':a.poster_image(_type='small')
+                          'title':a.title,
+                          'image':a.poster_image(_type='small')
                           })
-        # print(a.title, a.poster_image(_type='small'))
-    # readlist=readlist[::-1]
+    readlist=readlist[::-1]
 
     render_func = sync_to_async(render, thread_sensitive=True)
     return await render_func(request, 'manga/readlist.html', {'readlater': readlist, 'genres_list':genres_list})
