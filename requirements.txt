@@ -18,7 +18,7 @@ Pillow==10.0.1
 pytz==2023.3.post1
 pywin32==305.1
 requests==2.31.0
-urllib3==2.0.6
+urllib3==2.1.0
 yarl==1.9.2
 gunicorn==21.2.0
 dj-database-url==2.1.0
