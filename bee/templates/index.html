@@ -134,7 +134,7 @@
                         {% if  user.is_authenticated %}
                         <p><a href="{% url 'get_anime' anime.id %}" class="watch-now">Watch Now!</a></p>
                         {% else %}
-                        <p><a href="{% url 'login'%}" class="watch-now">Watch Now!</a></p>
+                        <p><a href="{% url 'login'%}" class="watch-now" target="_blank">Watch Now!</a></p>
                         {%endif%}
                     </div>
                 </div>
