@@ -80,9 +80,9 @@ WSGI_APPLICATION = "realm.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kiwi',
+        'NAME': 'name of database',
         'USER': 'root',
-        'PASSWORD': "madras@1234",
+        'PASSWORD': "your password",
         'HOST': 'localhost',  
         'PORT': '3306',
     }
