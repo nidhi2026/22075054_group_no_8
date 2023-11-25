@@ -77,35 +77,6 @@ WSGI_APPLICATION = "realm.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-<<<<<<< HEAD
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'kiwi',
-#         'USER': 'root',
-#         'PASSWORD': "",
-#         'HOST': 'localhost',  
-#         'PORT': '3306',
-#     }
-# }
-=======
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'name of database',
-        'USER': 'root',
-        'PASSWORD': "your password",
-        'HOST': 'localhost',  
-        'PORT': '3306',
-    }
-}
->>>>>>> d2ebb1b9ccddbf63a3c0da50f5a3486f67d805d8
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
