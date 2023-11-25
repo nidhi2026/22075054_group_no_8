@@ -1,0 +1,14 @@
+{
+    "builds": [
+      {
+        "src": "realm/wsgi.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "realm/wsgi.py"
+      }
+    ]
+}
